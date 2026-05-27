@@ -25,7 +25,7 @@ func NewDailyService(client *github.Client, target github.ProgressLogTarget) *Da
 // Run scans all GitHub repos for today's commits and writes the log only
 // to the configured progress repo (never to other repositories).
 func (s *DailyService) Run(ctx context.Context) (*github.DailyProgressResult, error) {
-	summary, err := s.client.CollectTodayCommits(ctx)
+	summary, err := s.client.CollectTodayCommits(ctx, s.target.FullName())
 	if err != nil {
 		return nil, fmt.Errorf("collect today commits: %w", err)
 	}

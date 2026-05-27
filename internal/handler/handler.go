@@ -31,7 +31,7 @@ func (h *Handler) Health(c echo.Context) error {
 }
 
 func (h *Handler) ActivityToday(c echo.Context) error {
-	summary, err := h.client.CollectTodayCommits(c.Request().Context())
+	summary, err := h.client.CollectTodayCommits(c.Request().Context(), "")
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}

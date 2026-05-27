@@ -196,7 +196,8 @@ func shortSHA(sha string) string {
 }
 
 // CollectTodayCommits lists repos, fetches commits since today, and builds a summary.
-func (c *Client) CollectTodayCommits(ctx context.Context) (*TodaySummary, error) {
+// excludeRepo skips the progress-log repository so automated log commits are not counted.
+func (c *Client) CollectTodayCommits(ctx context.Context, excludeRepo string) (*TodaySummary, error) {
 	user, _, err := c.gh.Users.Get(ctx, "")
 	if err != nil {
 		return nil, fmt.Errorf("get authenticated user: %w", err)
@@ -211,6 +212,10 @@ func (c *Client) CollectTodayCommits(ctx context.Context) (*TodaySummary, error)
 	var repoSummaries []RepoCommitSummary
 
 	for _, repo := range repos {
+		if excludeRepo != "" && repo.GetFullName() == excludeRepo {
+			continue
+		}
+
 		owner := repo.GetOwner().GetLogin()
 		name := repo.GetName()
 

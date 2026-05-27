@@ -10,13 +10,17 @@ import (
 	gh "github.com/google/go-github/v60/github"
 )
 
-const progressLogFileHeader = "# Developer Progress Log\n\nDaily GitHub activity tracked automatically.\n\n"
+const progressLogFileHeader = "# Engineering Progress Log\n\nDaily GitHub activity tracked automatically.\n\n"
 
 type ProgressLogTarget struct {
 	Owner  string
 	Repo   string
 	Branch string
 	Path   string
+}
+
+func (t ProgressLogTarget) FullName() string {
+	return t.Owner + "/" + t.Repo
 }
 
 type ProgressLogSyncResult struct {
@@ -113,7 +117,7 @@ func upsertProgressLogSection(existing, date, entry string) string {
 		return existing[:idx] + entry
 	}
 
-	if strings.HasPrefix(existing, "# Developer Progress Log") {
+	if strings.HasPrefix(existing, "# Engineering Progress Log") {
 		headerEnd := strings.Index(existing, "\n\n")
 		if headerEnd >= 0 {
 			insertAt := headerEnd + 2
