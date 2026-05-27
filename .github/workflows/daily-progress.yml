@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TZ: Asia/Kolkata
+      PROGRESS_LOG_REPO_URL: https://github.com/aryan735/engineering-progress-log
+      PROGRESS_LOG_PATH: engineering-progress-log.md
+      PROGRESS_LOG_BRANCH: main
 
     steps:
       - name: Checkout
