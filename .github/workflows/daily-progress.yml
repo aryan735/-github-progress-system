@@ -1,0 +1,28 @@
+name: Daily Progress Log
+
+on:
+  schedule:
+    # 10:30 PM IST = 17:00 UTC (GitHub Actions cron uses UTC)
+    - cron: "30 17 * * *"
+  workflow_dispatch:
+
+jobs:
+  daily-progress:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Asia/Kolkata
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+
+      - name: Run daily progress job
+        env:
+          GH_PROGRESS_TOKEN: ${{ secrets.GH_PROGRESS_TOKEN }}
+        run: go run ./cmd/daily
