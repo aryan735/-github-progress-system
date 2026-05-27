@@ -1,0 +1,24 @@
+# Secrets and local config
+internal/config/config.yml
+.env
+.env.*
+
+# Go build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+/bin/
+/dist/
+/cmd/server/server
+/cmd/daily/daily
+
+# IDE and OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

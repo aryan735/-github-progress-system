@@ -1,0 +1,7 @@
+github_token: "your-github-pat-here"
+
+progress_log:
+  owner: aryan735
+  repo: "-github-progress-system"
+  branch: main
+  path: docs/developer-progress-log.md
