@@ -1,4 +1,3 @@
-
 package github
 
 import (
@@ -12,8 +11,8 @@ type Client struct {
 	gh *github.Client
 }
 
-func NewClient(token string) *Client  {
-	ts:= oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
-   tc:= oauth2.NewClient(context.Background(), ts)
-   return &Client{gh: github.NewClient(tc)}
+func NewGitHubClient(token string) *Client {
+	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
+	tc := oauth2.NewClient(context.Background(), ts)
+	return &Client{gh: github.NewClient(tc)}
 }

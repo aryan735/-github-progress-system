@@ -16,7 +16,7 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	client := github.NewClient(cfg.GithubToken)
+	client := github.NewGitHubClient(cfg.GithubToken)
 	daily := scheduler.NewDailyService(client, cfg.ProgressLogTarget())
 	h := handler.New(client, daily)
 
