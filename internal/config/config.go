@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/aryan735/-github-progress-system/internal/github"
 	"gopkg.in/yaml.v3"
@@ -49,6 +50,7 @@ func LoadConfig(path string) (*Config, error) {
 	}
 
 	applyTokenFromEnv(&cfg)
+	applyProgressLogFromEnv(&cfg)
 	cfg.applyProgressLogDefaults()
 
 	if cfg.GithubToken == "" {
@@ -68,18 +70,60 @@ func applyTokenFromEnv(cfg *Config) {
 	}
 }
 
+func applyProgressLogFromEnv(cfg *Config) {
+	repoURL := os.Getenv("PROGRESS_LOG_REPO_URL")
+	if repoURL == "" {
+		repoURL = os.Getenv("PROGRESS_LOG_REPO")
+	}
+	if repoURL != "" {
+		owner, repo, err := parseGitHubRepoURL(repoURL)
+		if err != nil {
+			return
+		}
+		cfg.ProgressLog.Owner = owner
+		cfg.ProgressLog.Repo = repo
+	}
+
+	if branch := os.Getenv("PROGRESS_LOG_BRANCH"); branch != "" {
+		cfg.ProgressLog.Branch = branch
+	}
+	if path := os.Getenv("PROGRESS_LOG_PATH"); path != "" {
+		cfg.ProgressLog.Path = path
+	}
+}
+
+func parseGitHubRepoURL(raw string) (owner, repo string, err error) {
+	raw = strings.TrimSpace(raw)
+	raw = strings.TrimSuffix(raw, ".git")
+	raw = strings.TrimSuffix(raw, "/")
+
+	const prefix = "github.com/"
+	idx := strings.Index(raw, prefix)
+	if idx < 0 {
+		return "", "", fmt.Errorf("invalid github repo url: %s", raw)
+	}
+
+	path := strings.Trim(raw[idx+len(prefix):], "/")
+	parts := strings.SplitN(path, "/", 2)
+	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+		return "", "", fmt.Errorf("invalid github repo url: %s", raw)
+	}
+
+	return parts[0], parts[1], nil
+}
+
 func (c *Config) applyProgressLogDefaults() {
 	if c.ProgressLog.Owner == "" {
 		c.ProgressLog.Owner = "aryan735"
 	}
 	if c.ProgressLog.Repo == "" {
-		c.ProgressLog.Repo = "-github-progress-system"
+		c.ProgressLog.Repo = "engineering-progress-log"
 	}
 	if c.ProgressLog.Branch == "" {
 		c.ProgressLog.Branch = "main"
 	}
 	if c.ProgressLog.Path == "" {
-		c.ProgressLog.Path = "docs/developer-progress-log.md"
+		c.ProgressLog.Path = "engineering-progress-log.md"
 	}
 }
 
@@ -90,4 +134,8 @@ func (c *Config) ProgressLogTarget() github.ProgressLogTarget {
 		Branch: c.ProgressLog.Branch,
 		Path:   c.ProgressLog.Path,
 	}
+}
+
+func (c *Config) ProgressLogRepoURL() string {
+	return fmt.Sprintf("https://github.com/%s/%s", c.ProgressLog.Owner, c.ProgressLog.Repo)
 }

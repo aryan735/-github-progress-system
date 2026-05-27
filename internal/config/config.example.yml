@@ -1,7 +1,12 @@
 github_token: "your-github-pat-here"
 
+# Optional — prefer environment variables in production / CI:
+#   PROGRESS_LOG_REPO_URL=https://github.com/aryan735/engineering-progress-log
+#   PROGRESS_LOG_BRANCH=main
+#   PROGRESS_LOG_PATH=engineering-progress-log.md
+
 progress_log:
   owner: aryan735
-  repo: "-github-progress-system"
+  repo: engineering-progress-log
   branch: main
-  path: docs/developer-progress-log.md
+  path: engineering-progress-log.md
