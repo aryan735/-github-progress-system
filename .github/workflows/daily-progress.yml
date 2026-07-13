@@ -3,7 +3,7 @@ name: Daily Progress Log
 on:
   schedule:
     # 10:30 PM IST = 17:00 UTC (GitHub Actions cron uses UTC)
-    - cron: "30 17 * * *"
+    - cron: "30 13 * * *"
   workflow_dispatch:
 
 jobs:
