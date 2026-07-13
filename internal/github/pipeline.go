@@ -75,13 +75,14 @@ func (c *Client) listAuthenticatedUserRepos(ctx context.Context) ([]*gh.Reposito
 
 func (c *Client) listRepoCommitsSince(
 	ctx context.Context,
-	owner, repo string,
+	owner, author, repo string,
 	since time.Time,
 ) ([]*gh.RepositoryCommit, error) {
 	var all []*gh.RepositoryCommit
 
 	opts := &gh.CommitsListOptions{
 		Since: since,
+		Author: author,
 		ListOptions: gh.ListOptions{
 			PerPage: 100,
 		},
@@ -123,6 +124,16 @@ func commitDate(commit *gh.RepositoryCommit) (time.Time, bool) {
 func toCommit(commit *gh.RepositoryCommit) (Commit, bool) {
 	date, ok := commitDate(commit)
 	if !ok || !isToday(date) {
+		return Commit{}, false
+	}
+
+	// commit.Author is the resolved GitHub account (nil if unlinked);
+	// commit.Commit.Author is just the raw git name/email.
+	login := ""
+	if commit.Author != nil {
+		login = commit.Author.GetLogin()
+	}
+	if login != "aryan735" {
 		return Commit{}, false
 	}
 
@@ -202,12 +213,12 @@ func (c *Client) CollectTodayCommits(ctx context.Context, excludeRepo string) (*
 	if err != nil {
 		return nil, fmt.Errorf("get authenticated user: %w", err)
 	}
-
+      login := user.GetLogin() 
 	repos, err := c.listAuthenticatedUserRepos(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("list repos: %w", err)
 	}
-
+    
 	since := startOfToday()
 	var repoSummaries []RepoCommitSummary
 
@@ -218,8 +229,7 @@ func (c *Client) CollectTodayCommits(ctx context.Context, excludeRepo string) (*
 
 		owner := repo.GetOwner().GetLogin()
 		name := repo.GetName()
-
-		commits, err := c.listRepoCommitsSince(ctx, owner, name, since)
+		commits, err := c.listRepoCommitsSince(ctx, owner, login, name, since)
 		if err != nil {
 			continue
 		}
@@ -241,6 +251,6 @@ func (c *Client) CollectTodayCommits(ctx context.Context, excludeRepo string) (*
 		}
 	}
 
-	result := generateSummary(user.GetLogin(), len(repos), repoSummaries)
+	result := generateSummary(login, len(repos), repoSummaries)
 	return &result, nil
 }
